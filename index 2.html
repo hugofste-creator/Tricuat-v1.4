@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Tricuat"/>
+<meta name="theme-color" content="#f8f5f0"/>
+<title>Tricuat</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg:     #f8f5f0;
+  --bg2:    #f0ece4;
+  --bg3:    #e4ddd2;
+  --bg4:    #d4ccc0;
+  --ink:    #1a1612;
+  --ink2:   #635c54;
+  --ink3:   #a09890;
+  --sand:   #c8956a;
+  --sand-l: #f5e8da;
+  --safe-t: env(safe-area-inset-top,44px);
+  --safe-b: env(safe-area-inset-bottom,20px);
+  --r:      20px;
+  --r-sm:   14px;
+  --r-xs:   10px;
+  --ff-d:   'Lora', Georgia, serif;
+  --ff-b:   'Plus Jakarta Sans', sans-serif;
+  --sh:     0 1px 16px rgba(26,22,18,.07);
+  --sh-lg:  0 8px 40px rgba(26,22,18,.13);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg:#14110d;--bg2:#1c1914;--bg3:#26221c;--bg4:#322e28;
+    --ink:#f0ece6;--ink2:#9a9288;--ink3:#5a5450;--sand-l:#2a1e12;
+  }
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
+html,body{height:100%;overflow:hidden;background:var(--bg);}
+body{font-family:var(--ff-b);color:var(--ink);display:flex;flex-direction:column;height:100%;-webkit-font-smoothing:antialiased;}
+button,input,textarea{font-family:var(--ff-b);}
+
+.screen{display:none;flex-direction:column;height:100%;overflow:hidden;}
+.screen.active{display:flex;}
+
+/* ── TOPBAR ── */
+.topbar{
+  padding:calc(var(--safe-t)+12px) 22px 14px;
+  display:flex;align-items:center;justify-content:space-between;
+  background:var(--bg);border-bottom:1px solid var(--bg3);
+  position:relative;z-index:2;
+}
+.logo{display:flex;align-items:center;gap:12px;}
+.logo-wordmark{font-family:var(--ff-d);font-size:26px;font-weight:700;color:var(--ink);letter-spacing:-.5px;}
+.logo-wordmark em{color:var(--sand);font-style:italic;}
+.btn-new{
+  width:42px;height:42px;border-radius:50%;
+  background:var(--ink);color:var(--bg);border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 2px 12px rgba(26,22,18,.22);transition:transform .13s;
+}
+.btn-new:active{transform:scale(.84);}
+.btn-new svg{width:18px;height:18px;}
+
+.install-tip{
+  display:none;margin:10px 22px 0;background:var(--sand-l);
+  border-radius:var(--r-sm);padding:11px 14px;
+  font-size:12px;color:var(--ink2);line-height:1.65;
+}
+.install-tip b{color:var(--sand);font-weight:600;}
+.tip-x{float:right;cursor:pointer;color:var(--ink3);font-size:17px;line-height:1;margin-left:8px;}
+
+.list-scroll{
+  flex:1;overflow-y:auto;padding:16px 22px calc(var(--safe-b)+28px);
+  -webkit-overflow-scrolling:touch;display:flex;flex-direction:column;gap:14px;
+}
+
+/* ── PROJECT CARDS ── */
+.proj-card{
+  background:var(--bg2);border-radius:var(--r);border:1px solid var(--bg3);
+  overflow:hidden;cursor:pointer;box-shadow:var(--sh);
+  transition:transform .13s,box-shadow .13s;position:relative;
+}
+.proj-card:active{transform:scale(.975);box-shadow:none;}
+.proj-body{padding:18px 18px 14px;display:flex;align-items:center;gap:14px;}
+.proj-avatar{width:52px;height:52px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:27px;flex-shrink:0;}
+.proj-info{flex:1;min-width:0;}
+.proj-title{font-family:var(--ff-d);font-size:18px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:-.2px;}
+.proj-sub{font-size:12px;color:var(--ink3);margin-top:3px;}
+.proj-pills{display:flex;gap:6px;margin-top:9px;flex-wrap:wrap;}
+.pill{display:flex;align-items:center;gap:5px;background:var(--bg);border:1px solid var(--bg3);border-radius:30px;padding:4px 10px;font-size:12px;}
+.pill-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.pill-name{color:var(--ink2);}
+.pill-num{font-family:var(--ff-d);font-weight:700;font-size:13px;}
+.proj-chev{color:var(--ink3);flex-shrink:0;}
+.proj-prog{height:3px;background:var(--bg3);}
+.proj-prog-fill{height:100%;transition:width .5s ease;}
+.card-paw{position:absolute;bottom:10px;right:14px;font-size:26px;opacity:.06;pointer-events:none;user-select:none;transform:rotate(-18deg);}
+
+/* ── EMPTY ── */
+.empty-wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:40px 32px;text-align:center;}
+.empty-h{font-family:var(--ff-d);font-size:22px;font-style:italic;color:var(--ink2);}
+.empty-p{font-size:13px;color:var(--ink3);line-height:1.75;max-width:230px;}
+
+/* ── PROJECT SCREEN ── */
+.proj-bar{
+  padding:calc(var(--safe-t)+10px) 20px 14px;
+  display:flex;align-items:center;gap:12px;
+  background:var(--bg);border-bottom:1px solid var(--bg3);z-index:2;position:relative;
+}
+.btn-back{width:40px;height:40px;border-radius:50%;background:var(--bg2);border:1px solid var(--bg3);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink2);flex-shrink:0;transition:transform .12s;}
+.btn-back:active{transform:scale(.84);}
+.pbar-info{flex:1;min-width:0;}
+.pbar-name{font-family:var(--ff-d);font-size:19px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.pbar-meta{font-size:11px;color:var(--ink3);margin-top:2px;}
+.btn-dots{width:40px;height:40px;border-radius:50%;background:var(--bg2);border:1px solid var(--bg3);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink2);flex-shrink:0;}
+.btn-dots:active{background:var(--bg3);}
+.proj-scroll{flex:1;overflow-y:auto;padding:16px 20px calc(var(--safe-b)+86px);-webkit-overflow-scrolling:touch;display:flex;flex-direction:column;gap:16px;}
+
+/* ── COUNTER CARDS ── */
+.ctr-card{background:var(--bg2);border:1px solid var(--bg3);border-radius:var(--r);overflow:hidden;box-shadow:var(--sh);}
+.ctr-top{padding:16px 16px 0;display:flex;align-items:center;gap:10px;}
+.ctr-bar{width:4px;height:48px;border-radius:2px;flex-shrink:0;}
+.ctr-info{flex:1;min-width:0;}
+.ctr-name{font-family:var(--ff-d);font-size:16px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ctr-sub{font-size:11px;color:var(--ink3);margin-top:2px;}
+.ctr-num{font-family:var(--ff-d);font-size:46px;font-weight:700;line-height:1;flex-shrink:0;min-width:58px;text-align:right;}
+.ctr-num.pop{animation:numPop .2s cubic-bezier(.3,1.6,.5,1);}
+@keyframes numPop{0%,100%{transform:scale(1)}50%{transform:scale(1.18)}}
+.btn-opts{width:34px;height:34px;border-radius:50%;background:var(--bg);border:1px solid var(--bg3);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink3);flex-shrink:0;}
+.btn-opts:active{background:var(--bg3);}
+.ctr-tap{padding:12px 16px 14px;display:flex;align-items:center;gap:10px;}
+.btn-minus{width:54px;height:54px;border-radius:var(--r-sm);background:var(--bg);border:1px solid var(--bg3);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink2);flex-shrink:0;transition:transform .1s;}
+.btn-minus:active{transform:scale(.84);background:var(--bg3);}
+.btn-plus{flex:1;height:54px;border-radius:var(--r-sm);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-size:15px;font-weight:600;color:#fff;letter-spacing:.02em;transition:transform .1s,filter .1s;user-select:none;-webkit-user-select:none;}
+.btn-plus:active{transform:scale(.94);filter:brightness(.82);}
+.ctr-prog{padding:0 16px 12px;}
+.prog-track{height:5px;background:var(--bg3);border-radius:3px;overflow:hidden;}
+.prog-fill{height:100%;border-radius:3px;transition:width .4s ease;}
+.prog-row{display:flex;justify-content:space-between;margin-top:5px;}
+.prog-row span{font-size:11px;color:var(--ink3);}
+.ctr-notes{padding:0 16px 14px;}
+.notes-ta{width:100%;background:var(--bg);border:1px solid var(--bg3);border-radius:var(--r-xs);padding:9px 12px;font-size:13px;color:var(--ink);resize:none;outline:none;line-height:1.5;}
+.notes-ta::placeholder{color:var(--ink3);}
+.notes-ta:focus{border-color:var(--ink3);}
+
+/* ── FAB ── */
+.fab{position:fixed;bottom:calc(var(--safe-b)+22px);right:22px;width:56px;height:56px;border-radius:28px;background:var(--ink);color:var(--bg);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(26,22,18,.28);transition:transform .13s;z-index:10;}
+.fab:active{transform:scale(.84);}
+.fab svg{width:22px;height:22px;}
+
+/* ── SHEETS ── */
+.backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.46);z-index:200;align-items:flex-end;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);}
+.backdrop.open{display:flex;}
+.sheet{width:100%;background:var(--bg);border-radius:28px 28px 0 0;padding:0 0 calc(var(--safe-b)+12px);max-height:90vh;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.sheet-pull{width:36px;height:4px;border-radius:2px;background:var(--bg3);margin:14px auto 2px;}
+.sheet-title{font-family:var(--ff-d);font-size:22px;font-weight:700;padding:14px 24px 0;margin-bottom:22px;letter-spacing:-.2px;}
+.fg{padding:0 24px;margin-bottom:18px;}
+.fl{font-size:10px;font-weight:600;color:var(--ink3);letter-spacing:.1em;text-transform:uppercase;display:block;margin-bottom:8px;}
+.fi{width:100%;padding:14px 16px;border-radius:var(--r-sm);border:1.5px solid var(--bg3);background:var(--bg2);font-size:16px;color:var(--ink);outline:none;-webkit-appearance:none;transition:border-color .15s,background .15s;}
+.fi:focus{border-color:var(--sand);background:var(--bg);}
+.color-row{display:flex;gap:10px;flex-wrap:wrap;}
+.c-chip{width:36px;height:36px;border-radius:50%;border:3px solid transparent;cursor:pointer;transition:transform .13s,border-color .13s;flex-shrink:0;}
+.c-chip.sel{border-color:var(--ink);transform:scale(1.2);}
+.emoji-row{display:flex;gap:8px;flex-wrap:wrap;}
+.e-chip{width:44px;height:44px;border-radius:13px;background:var(--bg2);border:2px solid transparent;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:border-color .13s,background .13s,transform .1s;}
+.e-chip.sel{border-color:var(--sand);background:var(--sand-l);}
+.e-chip:active{transform:scale(.84);}
+.sb{display:block;width:calc(100% - 48px);margin:6px 24px 0;padding:15px 16px;border-radius:var(--r-sm);border:none;font-size:16px;font-weight:600;cursor:pointer;text-align:center;transition:opacity .1s,transform .1s;}
+.sb:active{opacity:.74;transform:scale(.97);}
+.sb.pri{background:var(--ink);color:var(--bg);}
+.sb.sec{background:var(--bg2);border:1px solid var(--bg3);color:var(--ink2);}
+.mi{display:flex;align-items:center;gap:14px;padding:15px 24px;cursor:pointer;font-size:15px;border-bottom:1px solid var(--bg2);transition:background .1s;}
+.mi:active{background:var(--bg2);}
+.mi:last-child{border-bottom:none;}
+.mi.red{color:#c0392b;}
+.mi-ico{width:36px;height:36px;border-radius:11px;background:var(--bg2);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:calc(var(--safe-b)+90px);left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--bg);border-radius:40px;padding:11px 22px;font-size:14px;font-weight:500;display:flex;align-items:center;gap:8px;box-shadow:var(--sh-lg);opacity:0;transition:opacity .28s,transform .28s;pointer-events:none;z-index:500;white-space:nowrap;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+
+<!-- ══ LIST ══ -->
+<div class="screen active" id="screen-list">
+  <div class="topbar">
+    <div class="logo">
+      <!-- CATBUS logo: wide round face, big bright eyes, huge grin, pointy ears, whiskers -->
+      <svg width="46" height="46" viewBox="0 0 46 46" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="fg" cx="42%" cy="38%" r="62%">
+            <stop offset="0%" stop-color="#fde8c8"/>
+            <stop offset="60%" stop-color="#f0a870"/>
+            <stop offset="100%" stop-color="#d87840"/>
+          </radialGradient>
+          <radialGradient id="eg" cx="40%" cy="30%" r="65%">
+            <stop offset="0%" stop-color="#f8d090"/>
+            <stop offset="100%" stop-color="#c87040"/>
+          </radialGradient>
+        </defs>
+        <!-- LEFT EAR -->
+        <polygon points="8,24 13,6 21,19" fill="url(#eg)"/>
+        <polygon points="10,22 14,9 19,19" fill="#f4b0b0" opacity=".6"/>
+        <!-- RIGHT EAR -->
+        <polygon points="38,24 33,6 25,19" fill="url(#eg)"/>
+        <polygon points="36,22 32,9 27,19" fill="#f4b0b0" opacity=".6"/>
+        <!-- FACE -->
+        <circle cx="23" cy="28" r="17.5" fill="url(#fg)"/>
+        <!-- CHEEK BLUSH -->
+        <ellipse cx="13" cy="33" rx="4.5" ry="2.8" fill="#e87878" opacity=".25"/>
+        <ellipse cx="33" cy="33" rx="4.5" ry="2.8" fill="#e87878" opacity=".25"/>
+        <!-- EYES — Catbus: large, round, luminous yellow-green -->
+        <ellipse cx="16" cy="25" rx="4.2" ry="4.8" fill="#f8f4a0"/>
+        <ellipse cx="30" cy="25" rx="4.2" ry="4.8" fill="#f8f4a0"/>
+        <!-- PUPILS -->
+        <ellipse cx="16" cy="25.5" rx="2.3" ry="3.2" fill="#180e04"/>
+        <ellipse cx="30" cy="25.5" rx="2.3" ry="3.2" fill="#180e04"/>
+        <!-- EYE SHINE -->
+        <circle cx="17.1" cy="23.8" r="1.1" fill="#ffffff"/>
+        <circle cx="31.1" cy="23.8" r="1.1" fill="#ffffff"/>
+        <!-- SMALL SECONDARY SHINE -->
+        <circle cx="15.2" cy="26.8" r=".55" fill="#ffffff" opacity=".6"/>
+        <circle cx="29.2" cy="26.8" r=".55" fill="#ffffff" opacity=".6"/>
+        <!-- NOSE -->
+        <polygon points="23,30.5 21.2,33 24.8,33" fill="#d85868"/>
+        <!-- CATBUS SIGNATURE WIDE GRIN -->
+        <path d="M12.5 35.5 Q23 44.5 33.5 35.5" stroke="#b04050" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+        <!-- TEETH -->
+        <path d="M16 37 Q23 43 30 37" fill="#fff" opacity=".85"/>
+        <!-- WHISKERS LEFT -->
+        <line x1="3"  y1="29.5" x2="13.5" y2="31" stroke="#fff" stroke-width="1" stroke-linecap="round" opacity=".7"/>
+        <line x1="3"  y1="32.5" x2="13.5" y2="32.5" stroke="#fff" stroke-width="1" stroke-linecap="round" opacity=".7"/>
+        <line x1="3"  y1="35.5" x2="13.5" y2="34" stroke="#fff" stroke-width="1" stroke-linecap="round" opacity=".7"/>
+        <!-- WHISKERS RIGHT -->
+        <line x1="43" y1="29.5" x2="32.5" y2="31" stroke="#fff" stroke-width="1" stroke-linecap="round" opacity=".7"/>
+        <line x1="43" y1="32.5" x2="32.5" y2="32.5" stroke="#fff" stroke-width="1" stroke-linecap="round" opacity=".7"/>
+        <line x1="43" y1="35.5" x2="32.5" y2="34" stroke="#fff" stroke-width="1" stroke-linecap="round" opacity=".7"/>
+      </svg>
+      <div class="logo-wordmark">Tri<em>cuat</em></div>
+    </div>
+    <button class="btn-new" onclick="openNewProjectSheet()">
+      <svg viewBox="0 0 18 18" fill="none"><path d="M9 2v14M2 9h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+
+  <div class="install-tip" id="install-tip">
+    <span class="tip-x" onclick="this.parentElement.style.display='none'">×</span>
+    <b>Installer sur iPhone :</b> Safari → Partager 📤 → <b>« Sur l'écran d'accueil »</b>
+  </div>
+
+  <div class="list-scroll" id="list-scroll"></div>
+</div>
+
+<!-- ══ PROJECT SCREEN ══ -->
+<div class="screen" id="screen-project">
+  <div class="proj-bar">
+    <button class="btn-back" onclick="goList()">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M11 4L6 9l5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <div class="pbar-info">
+      <div class="pbar-name" id="p-name"></div>
+      <div class="pbar-meta" id="p-meta"></div>
+    </div>
+    <button class="btn-dots" onclick="openSheet('sh-proj-menu')">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+        <circle cx="9" cy="5"  r="1.5" fill="currentColor"/>
+        <circle cx="9" cy="9"  r="1.5" fill="currentColor"/>
+        <circle cx="9" cy="13" r="1.5" fill="currentColor"/>
+      </svg>
+    </button>
+  </div>
+  <div class="proj-scroll" id="proj-scroll"></div>
+  <button class="fab" onclick="openNewCounterSheet()">
+    <svg viewBox="0 0 22 22" fill="none"><path d="M11 2v18M2 11h18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+  </button>
+</div>
+
+<!-- ══ NEW PROJECT SHEET ══ -->
+<div class="backdrop" id="sh-new-proj" onclick="if(event.target===this)closeSheet('sh-new-proj')">
+  <div class="sheet">
+    <div class="sheet-pull"></div>
+    <div class="sheet-title">Nouveau projet</div>
+    <div class="fg"><label class="fl">Nom du projet</label><input class="fi" id="np-name" type="text" placeholder="Ex : Écharpe d'hiver, Pull beige…"/></div>
+    <div class="fg"><label class="fl">Icône</label><div class="emoji-row" id="np-emoji"></div></div>
+    <div class="fg"><label class="fl">Couleur du thème</label><div class="color-row" id="np-color"></div></div>
+    <button class="sb pri" onclick="createProject()">Créer le projet</button>
+    <button class="sb sec" onclick="closeSheet('sh-new-proj')" style="margin-top:8px">Annuler</button>
+    <div style="height:10px"></div>
+  </div>
+</div>
+
+<!-- ══ NEW COUNTER SHEET ══ -->
+<div class="backdrop" id="sh-new-ctr" onclick="if(event.target===this)closeSheet('sh-new-ctr')">
+  <div class="sheet">
+    <div class="sheet-pull"></div>
+    <div class="sheet-title">Nouveau compteur</div>
+    <div class="fg"><label class="fl">Nom du compteur</label><input class="fi" id="nc-name" type="text" placeholder="Ex : Rang endroit, Répétition A…"/></div>
+    <div class="fg"><label class="fl">Couleur</label><div class="color-row" id="nc-color"></div></div>
+    <div class="fg"><label class="fl">Objectif en rangs (optionnel)</label><input class="fi" id="nc-target" type="number" min="0" placeholder="Ex : 60"/></div>
+    <button class="sb pri" onclick="createCounter()">Ajouter le compteur</button>
+    <button class="sb sec" onclick="closeSheet('sh-new-ctr')" style="margin-top:8px">Annuler</button>
+    <div style="height:10px"></div>
+  </div>
+</div>
+
+<!-- ══ PROJECT MENU ══ -->
+<div class="backdrop" id="sh-proj-menu" onclick="if(event.target===this)closeSheet('sh-proj-menu')">
+  <div class="sheet">
+    <div class="sheet-pull"></div>
+    <div class="mi" onclick="renameProject();closeSheet('sh-proj-menu')"><div class="mi-ico">✏️</div>Renommer le projet</div>
+    <div class="mi" onclick="resetAllCtrs();closeSheet('sh-proj-menu')"><div class="mi-ico">🔄</div>Tout remettre à zéro</div>
+    <div class="mi red" onclick="deleteProject();closeSheet('sh-proj-menu')"><div class="mi-ico">🗑️</div>Supprimer le projet</div>
+    <div class="mi" style="color:var(--ink3)" onclick="closeSheet('sh-proj-menu')"><div class="mi-ico" style="font-size:13px">✕</div>Annuler</div>
+  </div>
+</div>
+
+<!-- ══ COUNTER MENU ══ -->
+<div class="backdrop" id="sh-ctr-menu" onclick="if(event.target===this)closeSheet('sh-ctr-menu')">
+  <div class="sheet">
+    <div class="sheet-pull"></div>
+    <div class="mi" onclick="editCtrTarget();closeSheet('sh-ctr-menu')"><div class="mi-ico">🎯</div>Modifier l'objectif</div>
+    <div class="mi" onclick="renameCtr();closeSheet('sh-ctr-menu')"><div class="mi-ico">✏️</div>Renommer ce compteur</div>
+    <div class="mi" onclick="resetCtr();closeSheet('sh-ctr-menu')"><div class="mi-ico">🔄</div>Remettre à zéro</div>
+    <div class="mi red" onclick="deleteCtr();closeSheet('sh-ctr-menu')"><div class="mi-ico">🗑️</div>Supprimer ce compteur</div>
+    <div class="mi" style="color:var(--ink3)" onclick="closeSheet('sh-ctr-menu')"><div class="mi-ico" style="font-size:13px">✕</div>Annuler</div>
+  </div>
+</div>
+
+<!-- ══ TOAST ══ -->
+<div class="toast" id="toast"><span id="t-icon"></span><span id="t-msg"></span></div>
+
+<script>
+const COLORS=['#c8956a','#5b87c5','#6a9e78','#b85c7a','#8b70c0','#4aadaa','#c5a43a','#c05c5c','#7a9abf','#9a8878'];
+const EMOJIS=['🧶','🐱','🧣','🧤','🧥','🪡','🌸','🌿','⭐','🌙','🍂','💙','🐾','😺'];
+
+let projects=[];
+let activePid=null,activeCid=null;
+let npColor=COLORS[0],npEmoji=EMOJIS[0],ncColor=COLORS[1];
+
+function load(){try{projects=JSON.parse(localStorage.getItem('tricuat_v3')||'[]');}catch(e){projects=[];}}
+function save(){try{localStorage.setItem('tricuat_v3',JSON.stringify(projects));}catch(e){}}
+const getP=(id=activePid)=>projects.find(p=>p.id===id);
+const getC=(cid=activeCid,pid=activePid)=>getP(pid)?.counters.find(c=>c.id===cid);
+
+/* TOAST */
+let toastTmr=null;
+function toast(msg,icon='🐱'){
+  const el=document.getElementById('toast');
+  document.getElementById('t-msg').textContent=msg;
+  document.getElementById('t-icon').textContent=icon;
+  el.classList.add('show');
+  clearTimeout(toastTmr);
+  toastTmr=setTimeout(()=>el.classList.remove('show'),2600);
+}
+
+/* ── PICKERS (fixed: simple global vars, no closure issues) ── */
+function renderNpColor(){
+  document.getElementById('np-color').innerHTML=
+    COLORS.map(c=>`<div class="c-chip${c===npColor?' sel':''}" style="background:${c}" onclick="npColor='${c}';renderNpColor()"></div>`).join('');
+}
+function renderNpEmoji(){
+  document.getElementById('np-emoji').innerHTML=
+    EMOJIS.map(e=>`<div class="e-chip${e===npEmoji?' sel':''}" onclick="npEmoji='${e}';renderNpEmoji()">${e}</div>`).join('');
+}
+function renderNcColor(){
+  document.getElementById('nc-color').innerHTML=
+    COLORS.map(c=>`<div class="c-chip${c===ncColor?' sel':''}" style="background:${c}" onclick="ncColor='${c}';renderNcColor()"></div>`).join('');
+}
+
+/* ── CATBUS SVG (shared string for empty states) ── */
+function catbusSVG(size,op){
+  return `<svg width="${size}" height="${size}" viewBox="0 0 46 46" fill="none" style="opacity:${op}">
+    <defs>
+      <radialGradient id="fge" cx="42%" cy="38%" r="62%"><stop offset="0%" stop-color="#fde8c8"/><stop offset="60%" stop-color="#f0a870"/><stop offset="100%" stop-color="#d87840"/></radialGradient>
+      <radialGradient id="ege" cx="40%" cy="30%" r="65%"><stop offset="0%" stop-color="#f8d090"/><stop offset="100%" stop-color="#c87040"/></radialGradient>
+    </defs>
+    <polygon points="8,24 13,6 21,19" fill="url(#ege)"/>
+    <polygon points="10,22 14,9 19,19" fill="#f4b0b0" opacity=".6"/>
+    <polygon points="38,24 33,6 25,19" fill="url(#ege)"/>
+    <polygon points="36,22 32,9 27,19" fill="#f4b0b0" opacity=".6"/>
+    <circle cx="23" cy="28" r="17.5" fill="url(#fge)"/>
+    <ellipse cx="13" cy="33" rx="4.5" ry="2.8" fill="#e87878" opacity=".25"/>
+    <ellipse cx="33" cy="33" rx="4.5" ry="2.8" fill="#e87878" opacity=".25"/>
+    <ellipse cx="16" cy="25" rx="4.2" ry="4.8" fill="#f8f4a0"/>
+    <ellipse cx="30" cy="25" rx="4.2" ry="4.8" fill="#f8f4a0"/>
+    <ellipse cx="16" cy="25.5" rx="2.3" ry="3.2" fill="#180e04"/>
+    <ellipse cx="30" cy="25.5" rx="2.3" ry="3.2" fill="#180e04"/>
+    <circle cx="17.1" cy="23.8" r="1.1" fill="#fff"/>
+    <circle cx="31.1" cy="23.8" r="1.1" fill="#fff"/>
+    <polygon points="23,30.5 21.2,33 24.8,33" fill="#d85868"/>
+    <path d="M12.5 35.5 Q23 44.5 33.5 35.5" stroke="#b04050" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+    <path d="M16 37 Q23 43 30 37" fill="#fff" opacity=".85"/>
+    <line x1="3" y1="29.5" x2="13.5" y2="31" stroke="#fff" stroke-width="1" stroke-linecap="round" opacity=".7"/>
+    <line x1="3" y1="32.5" x2="13.5" y2="32.5" stroke="#fff" stroke-width="1" stroke-linecap="round" opacity=".7"/>
+    <line x1="3" y1="35.5" x2="13.5" y2="34" stroke="#fff" stroke-width="1" stroke-linecap="round" opacity=".7"/>
+    <line x1="43" y1="29.5" x2="32.5" y2="31" stroke="#fff" stroke-width="1" stroke-linecap="round" opacity=".7"/>
+    <line x1="43" y1="32.5" x2="32.5" y2="32.5" stroke="#fff" stroke-width="1" stroke-linecap="round" opacity=".7"/>
+    <line x1="43" y1="35.5" x2="32.5" y2="34" stroke="#fff" stroke-width="1" stroke-linecap="round" opacity=".7"/>
+  </svg>`;
+}
+
+/* ── LIST ── */
+function renderList(){
+  const el=document.getElementById('list-scroll');
+  if(!projects.length){
+    el.innerHTML=`<div class="empty-wrap">
+      ${catbusSVG(96,'.28')}
+      <div class="empty-h">Pas encore de projet…</div>
+      <div class="empty-p">Appuie sur <strong>+</strong> pour créer ton premier projet de tricot !</div>
+    </div>`;
+    return;
+  }
+  el.innerHTML=projects.map(p=>{
+    const total=p.counters.reduce((s,c)=>s+c.count,0);
+    const wt=p.counters.filter(c=>c.target>0);
+    const hasProg=wt.length>0;
+    const avgPct=hasProg?Math.min(100,Math.round(wt.reduce((s,c)=>s+c.count/c.target,0)/wt.length*100)):0;
+    const pills=p.counters.slice(0,4).map(c=>`<div class="pill"><div class="pill-dot" style="background:${c.color}"></div><span class="pill-name">${esc(c.name.length>12?c.name.slice(0,12)+'…':c.name)}</span><span class="pill-num" style="color:${c.color}">${c.count}</span></div>`).join('');
+    return `<div class="proj-card" onclick="openProject(${p.id})">
+      <div class="card-paw">🐾</div>
+      <div class="proj-body">
+        <div class="proj-avatar" style="background:${p.color}1a">${p.emoji}</div>
+        <div class="proj-info">
+          <div class="proj-title">${esc(p.name)}</div>
+          <div class="proj-sub">${p.counters.length} compteur${p.counters.length!==1?'s':''} · ${total} rang${total!==1?'s':''}</div>
+          ${p.counters.length?`<div class="proj-pills">${pills}</div>`:''}
+        </div>
+        <svg class="proj-chev" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      ${hasProg?`<div class="proj-prog"><div class="proj-prog-fill" style="width:${avgPct}%;background:${p.color}"></div></div>`:''}
+    </div>`;
+  }).join('');
+}
+
+/* ── PROJECT ── */
+function openProject(id){activePid=id;renderProject();show('screen-project');}
+function renderProject(){
+  const p=getP();if(!p)return;
+  document.getElementById('p-name').textContent=p.emoji+' '+p.name;
+  const total=p.counters.reduce((s,c)=>s+c.count,0);
+  document.getElementById('p-meta').textContent=`${p.counters.length} compteur${p.counters.length!==1?'s':''} · ${total} rang${total!==1?'s':''}`;
+  const el=document.getElementById('proj-scroll');
+  if(!p.counters.length){
+    el.innerHTML=`<div class="empty-wrap" style="padding-top:40px">
+      ${catbusSVG(72,'.22')}
+      <div class="empty-h" style="font-size:19px">Aucun compteur</div>
+      <div class="empty-p">Appuie sur <strong>+</strong> pour ajouter un compteur à ce projet.</div>
+    </div>`;
+    return;
+  }
+  el.innerHTML=p.counters.map(c=>{
+    const hasProg=c.target>0;
+    const pct=hasProg?Math.min(100,Math.round(c.count/c.target*100)):0;
+    const left=hasProg?Math.max(0,c.target-c.count):0;
+    return `<div class="ctr-card" id="card-${c.id}">
+      <div class="ctr-top">
+        <div class="ctr-bar" style="background:${c.color}"></div>
+        <div class="ctr-info">
+          <div class="ctr-name">${esc(c.name)}</div>
+          <div class="ctr-sub">${hasProg?`objectif : ${c.target} rangs · ${pct}%`:'aucun objectif fixé'}</div>
+        </div>
+        <div class="ctr-num" id="num-${c.id}" style="color:${c.color}">${c.count}</div>
+        <button class="btn-opts" onclick="openCtrMenu(${c.id})">
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><circle cx="7.5" cy="3" r="1.3" fill="currentColor"/><circle cx="7.5" cy="7.5" r="1.3" fill="currentColor"/><circle cx="7.5" cy="12" r="1.3" fill="currentColor"/></svg>
+        </button>
+      </div>
+      <div class="ctr-tap">
+        <button class="btn-minus" onclick="decrement(${c.id})">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 10h12" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+        </button>
+        <button class="btn-plus" style="background:${c.color}" onclick="increment(${c.id})">
+          <span style="font-size:20px;font-weight:300;line-height:1">+</span>
+          <span>rang suivant</span>
+        </button>
+      </div>
+      ${hasProg?`<div class="ctr-prog"><div class="prog-track"><div class="prog-fill" id="pf-${c.id}" style="width:${pct}%;background:${c.color}"></div></div><div class="prog-row"><span id="pl-${c.id}">${pct}%</span><span id="pr-${c.id}">${left>0?`encore ${left} rang${left!==1?'s':''}`:'✓ Terminé !'}</span></div></div>`:''}
+      <div class="ctr-notes"><textarea class="notes-ta" rows="2" placeholder="Notes : laine, aiguilles, point…" oninput="saveNotes(${c.id},this.value)">${esc(c.notes||'')}</textarea></div>
+    </div>`;
+  }).join('');
+}
+
+/* ── ACTIONS ── */
+function increment(cid){
+  const c=getC(cid);if(!c)return;
+  c.count++;save();updateCtrUI(cid);updateMeta();
+  if(c.target>0&&c.count===c.target)
+    setTimeout(()=>{if(confirm(`🎉 Objectif atteint pour "${c.name}" !\nRemettre à zéro ?`)){c.count=0;save();renderProject();}},300);
+}
+function decrement(cid){const c=getC(cid);if(!c||c.count===0)return;c.count--;save();updateCtrUI(cid);updateMeta();}
+function updateCtrUI(cid){
+  const c=getC(cid);if(!c)return;
+  const ne=document.getElementById('num-'+cid);
+  if(ne){ne.textContent=c.count;ne.classList.remove('pop');void ne.offsetWidth;ne.classList.add('pop');}
+  if(c.target>0){
+    const pct=Math.min(100,Math.round(c.count/c.target*100));
+    const left=Math.max(0,c.target-c.count);
+    const pf=document.getElementById('pf-'+cid);if(pf)pf.style.width=pct+'%';
+    const pl=document.getElementById('pl-'+cid);const pr=document.getElementById('pr-'+cid);
+    if(pl)pl.textContent=pct+'%';
+    if(pr)pr.textContent=left>0?`encore ${left} rang${left!==1?'s':''}`:'✓ Terminé !';
+  }
+}
+function updateMeta(){
+  const p=getP();if(!p)return;
+  const total=p.counters.reduce((s,c)=>s+c.count,0);
+  document.getElementById('p-meta').textContent=`${p.counters.length} compteur${p.counters.length!==1?'s':''} · ${total} rang${total!==1?'s':''}`;
+}
+function saveNotes(cid,v){const c=getC(cid);if(c){c.notes=v;save();}}
+
+/* ── MENUS ── */
+function renameProject(){const p=getP();if(!p)return;const v=prompt('Nouveau nom :',p.name);if(!v?.trim())return;p.name=v.trim();save();document.getElementById('p-name').textContent=p.emoji+' '+p.name;toast('Projet renommé !','✏️');}
+function resetAllCtrs(){const p=getP();if(!p||!confirm('Remettre TOUS les compteurs à zéro ?'))return;p.counters.forEach(c=>c.count=0);save();renderProject();toast('Remis à zéro','🔄');}
+function deleteProject(){const p=getP();if(!p||!confirm(`Supprimer "${p.name}" ?`))return;projects=projects.filter(x=>x.id!==activePid);save();goList();toast('Projet supprimé','🗑️');}
+function openCtrMenu(cid){activeCid=cid;openSheet('sh-ctr-menu');}
+function editCtrTarget(){const c=getC();if(!c)return;const v=prompt('Objectif en rangs (vide = aucun) :',c.target>0?c.target:'');if(v===null)return;c.target=parseInt(v)>0?parseInt(v):0;save();renderProject();}
+function renameCtr(){const c=getC();if(!c)return;const v=prompt('Nouveau nom :',c.name);if(!v?.trim())return;c.name=v.trim();save();renderProject();toast('Compteur renommé','✏️');}
+function resetCtr(){const c=getC();if(!c||!confirm(`Remettre "${c.name}" à zéro ?`))return;c.count=0;save();renderProject();toast('Remis à zéro','🔄');}
+function deleteCtr(){const p=getP();const c=getC();if(!p||!c||!confirm(`Supprimer "${c.name}" ?`))return;p.counters=p.counters.filter(x=>x.id!==activeCid);save();renderProject();toast('Compteur supprimé','🗑️');}
+
+/* ── CREATE ── */
+function openNewProjectSheet(){
+  npColor=COLORS[projects.length%COLORS.length];
+  npEmoji=EMOJIS[projects.length%EMOJIS.length];
+  document.getElementById('np-name').value='';
+  renderNpColor();renderNpEmoji();
+  openSheet('sh-new-proj');
+  setTimeout(()=>document.getElementById('np-name').focus(),150);
+}
+function createProject(){
+  const name=document.getElementById('np-name').value.trim()||'Nouveau projet';
+  const p={id:Date.now(),name,emoji:npEmoji,color:npColor,counters:[]};
+  projects.push(p);save();
+  closeSheet('sh-new-proj');
+  openProject(p.id);
+  setTimeout(()=>toast('Ton projet a été créé ! 🎉','🐱'),350);
+}
+function openNewCounterSheet(){
+  const p=getP();
+  ncColor=COLORS[(p?.counters.length||0)%COLORS.length];
+  document.getElementById('nc-name').value='';
+  document.getElementById('nc-target').value='';
+  renderNcColor();
+  openSheet('sh-new-ctr');
+  setTimeout(()=>document.getElementById('nc-name').focus(),150);
+}
+function createCounter(){
+  const p=getP();if(!p)return;
+  const name=document.getElementById('nc-name').value.trim()||'Compteur';
+  const target=parseInt(document.getElementById('nc-target').value)>0?parseInt(document.getElementById('nc-target').value):0;
+  p.counters.push({id:Date.now(),name,color:ncColor,count:0,target,notes:''});
+  save();closeSheet('sh-new-ctr');renderProject();
+  toast(`"${name}" ajouté !`,'✅');
+}
+
+/* ── NAV ── */
+function goList(){renderList();show('screen-list');}
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+function openSheet(id){document.getElementById(id).classList.add('open');}
+function closeSheet(id){document.getElementById(id).classList.remove('open');}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+/* ── INSTALL ── */
+function checkInstall(){if(/iphone|ipad|ipod/i.test(navigator.userAgent)&&!window.navigator.standalone)document.getElementById('install-tip').style.display='block';}
+
+/* ── SERVICE WORKER ── */
+if('serviceWorker' in navigator){
+  const sw=`const V='tricuat-v3';
+self.addEventListener('install',e=>{e.waitUntil(caches.open(V).then(c=>c.add(self.location.pathname)));self.skipWaiting();});
+self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==V).map(k=>caches.delete(k)))));});
+self.addEventListener('fetch',e=>{e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request)));});`;
+  navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw],{type:'application/javascript'}))).catch(()=>{});
+}
+
+load();renderList();checkInstall();
+</script>
+</body>
+</html>
